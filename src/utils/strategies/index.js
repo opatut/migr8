@@ -1,15 +1,6 @@
-import * as commonAncestor from './commonAncestor';
-import * as onlyUp from './onlyUp';
-import * as onlyDown from './onlyDown';
-import * as downUp from './downUp';
-import * as all from './all';
-import * as reorder from './reorder';
-
-export default {
-  commonAncestor,
-  onlyUp,
-  onlyDown,
-  downUp,
-  all,
-  reorder,
-};
+export * as commonAncestor from './commonAncestor';
+export * as onlyUp from './onlyUp';
+export * as onlyDown from './onlyDown';
+export * as downUp from './downUp';
+export * as all from './all';
+export * as reorder from './reorder';

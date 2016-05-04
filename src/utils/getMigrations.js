@@ -1,22 +1,17 @@
+import {join} from 'path';
 import globFs from 'glob-fs';
 
+import * as drivers from '../drivers';
 import {getConfig} from './config';
+
 
 const glob = globFs({
   gitignore: true,
 });
 
-export default function getMigrations() {
+function findMigrationFiles(pattern, cwd) {
   return new Promise((resolve, reject) => {
-    const {
-      migrations: {
-        path: cwd = process.cwd(),
-        pattern = '**.sql',
-      },
-    } = getConfig();
-
     const files = [];
-
     glob
       .readdirStream(pattern, {
         cwd,
@@ -31,3 +26,26 @@ export default function getMigrations() {
       });
   });
 }
+
+export default async () => {
+  const {
+    migrations: {
+      path: cwd = process.cwd(),
+      pattern = '**.sql',
+    },
+    driver: {
+      type: driverType,
+      ...driverConfig,
+    },
+  } = getConfig();
+
+  const files = await findMigrationFiles(pattern, cwd);
+
+  // load the driver that translates migrations into up/down functions
+  const driver = await drivers[driverType](driverConfig);
+
+  return await Promise.all(files.map(async (file) => ({
+    id: file,
+    ...(await driver(join(cwd, file))),
+  })));
+};

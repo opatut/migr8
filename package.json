@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "mkdir -p bin && babel --watch src/ --out-dir lib/",
-    "watch": "npm run build -- --watch",
+    "watch": "npm run build -- --watch --source-maps=inline",
     "lint": "eslint src/"
   },
   "bin": {
@@ -36,6 +36,7 @@
     "es6-promisify": "^4.0.0",
     "glob-fs": "^0.1.6",
     "knex": "^0.10.0",
+    "lodash": "^4.11.2",
     "node-dir": "^0.1.11",
     "pg": "^4.5.5",
     "yaml-parser": "^3.5.3"

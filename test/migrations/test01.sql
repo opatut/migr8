@@ -2,7 +2,7 @@
 
 CREATE TABLE test01 (
   id INT PRIMARY KEY,
-  name VARCHAR(32),
+  name VARCHAR(32)
 );
 
 

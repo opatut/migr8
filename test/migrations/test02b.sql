@@ -1,4 +1,6 @@
-this is the description for test02a
+title: 'Test 02-A'
+description: 'this is the description for test02b'
+author: 'foo bar'
 
 -- UP --
 

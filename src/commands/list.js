@@ -1,5 +1,5 @@
 import getMigrations from '../utils/getMigrations';
-import strategies from '../utils/strategies';
+import * as strategies from '../utils/strategies';
 
 export function parseListType(value) {
   if (value !== 'migrations' && value !== 'strategies') {
@@ -9,6 +9,8 @@ export function parseListType(value) {
 }
 
 function indent(indentString, str) {
+  if (!str) return str;
+
   const words = str.split(/[\s]+/);
   const lines = [[]];
   let lineLength = 0;
@@ -31,12 +33,21 @@ function indent(indentString, str) {
 }
 
 export default async function list(options) {
-  const {type = 'migrations', verbose = false} = options;
+  const {type = 'migrations'} = options;
+  const {verbose = false} = options.parent;
 
   if (type === 'migrations') {
     const allMigrations = await getMigrations();
-    console.log(allMigrations.join('\n'));
-    // TODO: verbose
+    console.log(
+      allMigrations
+        .map((migration) => {
+          if (verbose) {
+            return `${migration.id}:\n${indent('  ', migration.meta.description || 'no description')}\n`;
+          } else {
+            return migration.id;
+          }
+        })
+        .join('\n'));
   } else if (type === 'strategies') {
     console.log(
       Object.keys(strategies)

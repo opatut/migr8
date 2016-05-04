@@ -15,32 +15,33 @@ function wrap(cmd) {
 }
 
 program
-  .option('-c, --config <path>', 'Path to config file.')
+  .option('-c, --config <path>', 'path to config file')
+  .option('-n, --dry-run', 'do not actually execute any migrations, only print what would happen')
+  .option('-v, --verbose', 'be chatty')
   // .option('-b, --babel', 'Run javascript files with babel (please install and configure outside)')
   .version(version);
 
 program
   .command('migrate [target]')
-  .description('Migrate to the target file')
-  .option('-s, --strategy <strategy>', 'Select a strategy (default: common_ancestor).', parseStrategy, '')
-  .option('-e, --error', 'Exit with error if downward migrations were to be executed (useful in production).')
+  .description('migrate to the target file')
+  .option('-s, --strategy <strategy>', 'select a strategy (default: commonAncestor)', parseStrategy, 'commonAncestor')
+  .option('-e, --error', 'exit with error if downward migrations were to be executed (useful in production)')
   .action(wrap(migrate.target));
 
 program
   .command('up <migrations...>')
-  .description('Migrate up manually')
+  .description('migrate up manually')
   .action(wrap(migrate.up));
 
 program
   .command('down <migrations...>')
-  .description('Migrate down manually')
+  .description('migrate down manually')
   .action(wrap(migrate.down));
 
 program
   .command('list')
-  .description('List objects')
-  .option('-v, --verbose', 'Detailed listing')
-  .option('-t, --type <type>', 'what to list: \'migrations|strategies\' (default: migrations).', parseListType, 'migrations')
+  .description('list objects')
+  .option('-t, --type <type>', 'what to list: \'migrations|strategies\' (default: migrations)', parseListType, 'migrations')
   .action(wrap(list));
 
 export default program;

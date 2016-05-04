@@ -2,6 +2,8 @@ import _ from 'lodash';
 import promisify from 'es6-promisify';
 import fs from 'fs';
 import yaml from 'yaml-parser';
+import findParentDir from 'find-parent-dir';
+import {basename, join} from 'path';
 
 const readFile = promisify(fs.readFile);
 
@@ -12,9 +14,6 @@ const config = {
     client: 'pg',
     connection: {
       host: 'localhost',
-      user: 'test',
-      password: '',
-      database: 'testing',
     },
   },
 
@@ -40,8 +39,14 @@ export function mergeConfig(newConfig) {
   return _.merge(config, newConfig);
 }
 
-export async function loadConfig(filename) {
-  const content = await readFile(filename);
+export async function findConfig(filename = '.migraterc', cwd = process.cwd()) {
+  const dir = await promisify(findParentDir)(cwd, filename);
+  return dir ? join(dir, filename) : null;
+}
+
+export async function loadConfig(path) {
+  const content = await readFile(path);
+  const filename = basename(path);
   const newConfig = yaml.safeLoad(content, {filename});
   return mergeConfig(newConfig);
 }

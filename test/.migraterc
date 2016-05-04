@@ -1,0 +1,10 @@
+database:
+  client: pg
+  connection:
+    host: localhost
+    user: test
+    password: ''
+    database: testing
+migrations:
+  pattern: '**.sql'
+  path: migrations

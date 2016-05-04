@@ -6,6 +6,6 @@ export const description = `
 `;
 
 export function resolve(target, current, all) {
-  return _.difference(all, current)
-    .map((name) => ({name, direction: 'up'}));
+  return _.differenceBy(all, current, 'id')
+    .map((migration) => ({migration, direction: 'up'}));
 }
