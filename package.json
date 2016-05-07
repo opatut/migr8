@@ -4,6 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "repository": "https://github.com/opatut/migr8",
+  "bugs": "https://github.com/opatut/migr8/issues",
   "scripts": {
     "prepublish": "npm run validate && npm run build",
     "build": "babel src/ --out-dir lib/",
