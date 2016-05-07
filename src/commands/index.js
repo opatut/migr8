@@ -18,7 +18,7 @@ program
   .option('-c, --config <path>', 'path to config file')
   .option('-n, --dry-run', 'do not actually execute any migrations, only print what would happen')
   .option('-v, --verbose', 'be chatty')
-  .option('-t, --transaction <mode>', 'choose a transaction mode -- off: no transactions, discrete: one transaction per migrations, combined: one transaction for all migrations (default)', parseTransactionMode, 'combined')
+  .option('-t, --transaction <mode>', 'choose a transaction mode -- off: no transactions, discrete: one transaction per migration, combined: one transaction for all migrations (default)', parseTransactionMode, 'combined')
   // .option('-b, --babel', 'Run javascript files with babel (please install and configure outside)')
   .version(version);
 
@@ -41,7 +41,7 @@ program
 
 program
   .command('list [type]')
-  .description('list objects')
+  .description('list objects (migrations, strategies)')
   .action(wrap(list));
 
 export default program;

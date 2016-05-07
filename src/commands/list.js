@@ -14,7 +14,7 @@ export function parseListType(value) {
 function indent(indentString, str) {
   if (!str) return str;
 
-  const words = str.split(/[\s]+/);
+  const words = str.trim().split(/[\s]+/);
   const lines = [[]];
   let lineLength = 0;
   const maxLineLength = 80 - indentString.length;
