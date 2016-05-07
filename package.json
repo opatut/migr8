@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "lib/index.js",
+  "repository": "https://github.com/opatut/migr8",
   "scripts": {
     "prepublish": "npm run validate && npm run build",
     "build": "babel src/ --out-dir lib/",
@@ -19,7 +20,7 @@
   "bin": {
     "migr8": "lib/index.js"
   },
-  "author": "",
+  "author": "Paul 'opatut' Bienkowski <npm@opatut.de>",
   "license": "ISC",
   "devDependencies": {
     "babel": "6.5.2",
