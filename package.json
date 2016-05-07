@@ -1,6 +1,6 @@
 {
   "name": "migr8",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "lib/index.js",
   "repository": "https://github.com/opatut/migr8",
@@ -53,10 +53,12 @@
     "validate-commit-msg": "2.5.0"
   },
   "dependencies": {
+    "babel-polyfill": "6.8.0",
     "commander": "^2.9.0",
     "es6-promisify": "^4.0.0",
     "find-parent-dir": "^0.3.0",
     "glob-fs": "^0.1.6",
+    "invariant": "2.2.1",
     "knex": "^0.10.0",
     "lodash": "^4.11.2",
     "node-dir": "^0.1.11",
