@@ -2,7 +2,7 @@
   "name": "migr8",
   "version": "0.1.0",
   "description": "",
-  "main": "lib",
+  "main": "lib/index.js",
   "scripts": {
     "prepublish": "npm run validate && npm run build",
     "build": "babel src/ --out-dir lib/",
@@ -17,7 +17,7 @@
     "watch:test": "npm run test -- -w"
   },
   "bin": {
-    "migr8": "lib"
+    "migr8": "lib/index.js"
   },
   "author": "",
   "license": "ISC",

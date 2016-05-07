@@ -23,7 +23,7 @@ program
   .version(version);
 
 program
-  .command('migrate [target]')
+  .command('to [target]')
   .description('migrate to the target file')
   .option('-s, --strategy <strategy>', 'select a strategy (default: commonAncestor)', parseStrategy, 'commonAncestor')
   .option('-g, --guarded', 'do not run down migrations, exit with error if downward migrations have to be executed (useful in production)')
