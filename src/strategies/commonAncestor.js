@@ -4,7 +4,17 @@ export const description = `
   target.
 `;
 
-// TODO
-export function resolve() {
-  throw new Error('Not implemented');
+export function resolve(target, current) {
+  let i = 0; // this counts up to the common prefix length
+  while (i < target.length && i < current.length && target[i].id === current[i].id) {
+    i++;
+  }
+
+  const down = current.slice(i);
+  const up = target.slice(i);
+
+  return [
+    ...down.reverse().map((migration) => ({migration, direction: 'down'})),
+    ...up.map((migration) => ({migration, direction: 'up'})),
+  ];
 }
