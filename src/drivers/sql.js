@@ -20,8 +20,8 @@ export default async function () {
     const downLine = lines.findIndex((line) => DOWN_REGEX.test(line));
 
     const metaText = (upLine === -1) ? undefined : lines.slice(0, upLine).join('\n');
-    const upSql = lines.slice(upLine === -1 ? 0 : upLine, downLine === -1 ? lines.length : downLine).join('\n');
-    const downSql = downLine === -1 ? undefined : lines.slice(downLine);
+    const upSql = lines.slice(upLine === -1 ? 0 : (upLine + 1), downLine === -1 ? lines.length : downLine).join('\n');
+    const downSql = downLine === -1 ? undefined : lines.slice(downLine).join('\n');
 
     let meta;
 
@@ -42,11 +42,11 @@ export default async function () {
 
     return {
       meta,
-      up: async (db) => {
-        return await db.raw(upSql);
+      up: async (db, trx) => {
+        return await db.raw(upSql).transacting(trx);
       },
-      down: downSql ? async (db) => {
-        return await db.raw(downSql);
+      down: downSql ? async (db, trx) => {
+        return await db.raw(downSql).transacting(trx);
       } : undefined,
     };
   };

@@ -1,8 +1,8 @@
 import program from 'commander';
 import {version} from '../../package.json';
 
-import migrate, {parseStrategy} from './migrate';
-import list, {parseListType} from './list';
+import migrate, {parseStrategy, parseTransactionMode} from './migrate';
+import list from './list';
 
 export let selectedCommand = function defaultHelp() {
   program.outputHelp();
@@ -18,6 +18,7 @@ program
   .option('-c, --config <path>', 'path to config file')
   .option('-n, --dry-run', 'do not actually execute any migrations, only print what would happen')
   .option('-v, --verbose', 'be chatty')
+  .option('-t, --transaction <mode>', 'choose a transaction mode -- off: no transactions, discrete: one transaction per migrations, combined: one transaction for all migrations (default)', parseTransactionMode, 'combined')
   // .option('-b, --babel', 'Run javascript files with babel (please install and configure outside)')
   .version(version);
 
@@ -25,7 +26,7 @@ program
   .command('migrate [target]')
   .description('migrate to the target file')
   .option('-s, --strategy <strategy>', 'select a strategy (default: commonAncestor)', parseStrategy, 'commonAncestor')
-  .option('-e, --error', 'exit with error if downward migrations were to be executed (useful in production)')
+  .option('-g, --guarded', 'do not run down migrations, exit with error if downward migrations have to be executed (useful in production)')
   .action(wrap(migrate.target));
 
 program
@@ -39,9 +40,8 @@ program
   .action(wrap(migrate.down));
 
 program
-  .command('list')
+  .command('list [type]')
   .description('list objects')
-  .option('-t, --type <type>', 'what to list: \'migrations|strategies\' (default: migrations)', parseListType, 'migrations')
   .action(wrap(list));
 
 export default program;

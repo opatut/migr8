@@ -5,10 +5,18 @@ import invariant from 'invariant';
 
 import getMigrations from '../utils/getMigrations';
 import {runQueue} from '../utils/runQueue';
-import * as strategies from '../utils/strategies';
+import * as strategies from '../strategies';
 import * as storages from '../storages';
 import {getConfig} from '../utils/config';
 import {db} from '../utils/database';
+
+async function getStorage() {
+  const {
+    storage: {type, ...config},
+  } = getConfig();
+
+  return await storages[type](config);
+}
 
 function createMigrateFunction(direction) {
   invariant(direction === 'up' || direction === 'down', `Invalid direction: ${direction}.`);
@@ -34,8 +42,16 @@ function createMigrateFunction(direction) {
     }
 
     const queue = migrationsToRun.map((migration) => ({migration, direction}));
-    await runQueue(queue, options);
+    const storage = await getStorage();
+    await runQueue(queue, storage, options);
   };
+}
+
+export function parseTransactionMode(value) {
+  if (/^(o(ff)?|false|no|0)$/i.test(value)) return 'off';
+  if (/^(d(iscrete)?|separate|each|many)$/i.test(value)) return 'discrete';
+  if (/^(c(ombined)?|group(ed)?|single|one|true|yes|1)$/i.test(value)) return 'combined';
+  throw new Error(`Not a transaction mode: ${value}.`);
 }
 
 export function parseStrategy(value) {
@@ -52,14 +68,8 @@ export const target = async (targetFilePath, options) => {
   const {
     strategy: strategyName,
     parent: {verbose},
+    guarded,
   } = options;
-
-  const {
-    storage: {
-      type: storageType,
-      ...storageConfig,
-    },
-  } = getConfig();
 
   const allMigrations = await getMigrations();
 
@@ -75,7 +85,7 @@ export const target = async (targetFilePath, options) => {
     .filter((x) => x)
     .map((id) => allMigrationsMap[id]);
 
-  const storage = await storages[storageType](storageConfig);
+  const storage = await getStorage();
 
   const currentMigrationsIds = await storage.list(db);
   const currentMigrations = currentMigrationsIds.map((id) => allMigrationsMap[id]);
@@ -95,7 +105,14 @@ export const target = async (targetFilePath, options) => {
   const strategy = strategies[strategyName];
   const queue = strategy.resolve(targetMigrations, currentMigrations, allMigrations);
 
-  await runQueue(queue, options);
+  if (guarded) {
+    const downMigrations = queue.filter(({direction}) => direction === 'down');
+    if (downMigrations.length > 0) {
+      throw new Error(`The following ${downMigrations.length} were planned to migrated down, but you are running in guarded mode: ${downMigrations.map(({migration: {id}}) => id).join(', ')}`);
+    }
+  }
+
+  await runQueue(queue, storage, options);
 };
 
 export default {up, down, target};

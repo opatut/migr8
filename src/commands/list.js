@@ -1,9 +1,12 @@
 import getMigrations from '../utils/getMigrations';
-import * as strategies from '../utils/strategies';
+import * as strategies from '../strategies';
 
 export function parseListType(value) {
   if (value !== 'migrations' && value !== 'strategies') {
-    throw new Error(`Cannot list ${value} -- unknown type.`);
+    console.error(`Unknown type to list: ${value}. Available types:
+  strategies
+  migrations`);
+    process.exit(1);
   }
   return value;
 }
@@ -32,8 +35,10 @@ function indent(indentString, str) {
     .join('\n');
 }
 
-export default async function list(options) {
-  const {type = 'migrations'} = options;
+
+export default async function list(type = 'migrations', options) {
+  parseListType(type);
+
   const {verbose = false} = options.parent;
 
   if (type === 'migrations') {

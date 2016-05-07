@@ -14,7 +14,7 @@ export default async function (options) {
     list: async (db) => {
       await createTable(db);
       const rows = await db(tableName).select('id').orderBy('index');
-      return rows.map(({name}) => name);
+      return rows.map(({id}) => id);
     },
     add: async (db, ids) => {
       await createTable(db);
@@ -22,7 +22,7 @@ export default async function (options) {
     },
     remove: async (db, ids) => {
       await createTable(db);
-      await db.whereIn('id', ids).delete();
+      await db(tableName).whereIn('id', ids).delete();
     },
   };
 }
