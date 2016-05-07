@@ -17,7 +17,6 @@ export default async function run() {
   // set up database connection
   await connect();
 
-
   try {
     // run command
     await selectedCommand();

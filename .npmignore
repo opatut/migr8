@@ -1,5 +1,8 @@
-!lib/
-*.test.js
-lib/test/
 src/
 test/
+lib/test/
+.babelrc
+.eslintrc
+.editorconfig
+.npmignore
+*.tgz
