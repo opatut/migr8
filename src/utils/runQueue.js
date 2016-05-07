@@ -100,17 +100,27 @@ export async function runQueue(queue, storage, options) {
         .map(({migration: {id}}) => id);
 
       if (downIds.length > 0) {
+        if (verbose) {
+          console.log(`storage: remove ${downIds.length} migrations: ${downIds.join(', ')}`);
+        }
         await storage.remove(db, downIds);
       }
 
       if (upIds.length > 0) {
+        if (verbose) {
+          console.log(`storage: add ${upIds.length} migrations: ${upIds.join(', ')}`);
+        }
         await storage.add(db, upIds);
       }
     }
   } catch (err) {
     if (trx) {
       if (verbose) {
-        console.log('error detected -- rollback transaction\n');
+        console.log();
+        console.warn('==========================================');
+        console.warn('! ERROR DETECTED -- TRANSACTION ROLLBACK !');
+        console.warn('==========================================');
+        console.log();
       }
       await trx.rollback();
     }

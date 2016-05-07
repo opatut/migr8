@@ -108,7 +108,7 @@ export const target = async (targetFilePath, options) => {
   if (guarded) {
     const downMigrations = queue.filter(({direction}) => direction === 'down');
     if (downMigrations.length > 0) {
-      throw new Error(`The following ${downMigrations.length} were planned to migrated down, but you are running in guarded mode: ${downMigrations.map(({migration: {id}}) => id).join(', ')}`);
+      throw new Error(`The following ${downMigrations.length} migrations were planned to be undone, but you are running in guarded mode: ${downMigrations.map(({migration: {id}}) => id).join(', ')}`);
     }
   }
 
