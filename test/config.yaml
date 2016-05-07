@@ -1,5 +1,0 @@
-driver:
-  type: sql
-storage:
-  type: sql
-  tableName: test_migrations

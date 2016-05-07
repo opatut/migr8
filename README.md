@@ -16,7 +16,7 @@ This is a tool for running migrations on relational databases. It uses [knex](ht
 ## Usage &ndash; TL;DR version
 
 1. Create your migrations. See *Migrations format* for details. Place them all somewhere, preferably in their *own repository*.
-1. Configure the tool by creating a `.migraterc` in your project directory. Refer to the *Config* section for details.
+1. Configure the tool by creating a `.migr8.yaml` in your project directory. Refer to the *Config* section for details.
 1. Create a file, e.g. `migrations.txt` somewhere in your repository, listing the migrations you want to have applied.
 1. Run `migr8 to migrations.txt` to apply the target state.
 

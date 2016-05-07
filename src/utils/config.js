@@ -39,7 +39,7 @@ export function mergeConfig(newConfig) {
   return _.merge(config, newConfig);
 }
 
-export async function findConfig(filename = '.migraterc', cwd = process.cwd()) {
+export async function findConfig(filename = '.migra8.yaml', cwd = process.cwd()) {
   const dir = await promisify(findParentDir)(cwd, filename);
   return dir ? join(dir, filename) : null;
 }
