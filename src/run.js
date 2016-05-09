@@ -7,10 +7,16 @@ export default async function run() {
 
   const configPath = await findConfig();
   if (configPath) {
+    if (program.verbose) {
+      console.log(`Loading config from: ${configPath}`);
+    }
     await loadConfig(configPath);
   }
 
   if (program.config) {
+    if (program.verbose) {
+      console.log(`Loading config from: ${program.config}`);
+    }
     await loadConfig(program.config);
   }
 

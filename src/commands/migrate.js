@@ -79,16 +79,24 @@ export const target = async (targetFilePath, options) => {
     o[value.id] = value;
   }, {});
 
+  const getMigration = (id) => {
+    if (!allMigrationsMap[id]) {
+      throw new Error(`Migration not found: ${id}`);
+    }
+
+    return allMigrationsMap[id];
+  };
+
   const targetMigrations = targetContent
     .split('\n')
     .map((x) => x.trim())
     .filter((x) => x)
-    .map((id) => allMigrationsMap[id]);
+    .map(getMigration);
 
   const storage = await getStorage();
 
   const currentMigrationsIds = await storage.list(db);
-  const currentMigrations = currentMigrationsIds.map((id) => allMigrationsMap[id]);
+  const currentMigrations = currentMigrationsIds.map(getMigration);
 
   if (verbose) {
     console.log('Current state:', currentMigrations.length);

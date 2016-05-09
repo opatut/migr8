@@ -6,5 +6,8 @@ database:
     password: ''
     database: testing
 migrations:
-  pattern: '**.sql'
-  path: migrations
+  pattern: '**.js'
+  path: migrations-js
+driver:
+  type: 'js'
+  babel: true

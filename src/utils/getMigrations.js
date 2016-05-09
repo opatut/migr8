@@ -1,16 +1,29 @@
-import {join} from 'path';
+import path from 'path';
+import fs from 'fs';
 import globFs from 'glob-fs';
 
 import * as drivers from '../drivers';
 import {getConfig} from './config';
 
-
 const glob = globFs({
   gitignore: true,
 });
 
-function findMigrationFiles(pattern, cwd) {
-  return new Promise((resolve, reject) => {
+function exists(file) {
+  return new Promise((resolve) => {
+    fs.stat(file, (err) => {
+      resolve(!err);
+    });
+  });
+}
+
+async function findMigrationFiles(pattern, cwd) {
+  if (!await exists(cwd)) {
+    console.warn(`Migrations path not found: ${cwd}`);
+    return [];
+  }
+
+  return await new Promise((resolve, reject) => {
     const files = [];
     glob
       .readdirStream(pattern, {
@@ -39,13 +52,14 @@ export default async () => {
     },
   } = getConfig();
 
-  const files = await findMigrationFiles(pattern, cwd);
+  const directory = path.resolve(cwd);
+  const files = await findMigrationFiles(pattern, directory);
 
   // load the driver that translates migrations into up/down functions
   const driver = await drivers[driverType](driverConfig);
 
   return await Promise.all(files.map(async (file) => ({
     id: file,
-    ...(await driver(join(cwd, file))),
+    ...(await driver(path.join(directory, file))),
   })));
 };
