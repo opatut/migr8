@@ -9,14 +9,22 @@ This is a tool for running migrations on relational databases. It uses [knex](ht
 ## Feature overview
 
 * Target specification: Define your desired database state in a single text file, where you can choose the order in which to apply migrations. Put that file into your VCS and merge it when merging branches!
-* modular driver system: Write your migrations in pure SQL, using the knex interface, or any other interface you like.
-* upgrade strategies: Many functions for actual to desired state resolution included.
-* transaction support: Wraps either for each migration into a transaction, or the whole operation.
+* Modular driver system: Write your migrations in pure SQL, or using the knex interface, or simply plug in your own interface to parse and execute your migrations.
+* Upgrade strategies: Includes different ways to resolve how to upgrade from the actual to the desired state.
+* Transactions: Wraps either each migration into a transaction, or the whole operation.
+
+Planned features include:
+
+* git integration: collect migrations across branches, apply or undo them from somewhere else
+* seeding: fill your database the way you define your schema, but fit to your developer's needs
+* maintenance tasks: define tasks to run on your database and use from your application or the CLI (e.g. in cron jobs)
+
+You have an idea that will make this tool more awesome? Post an [issue on github](https://github.com/opatut/migr8/issues/new).
 
 ## Usage &ndash; TL;DR version
 
-1. Create your migrations. See *Migrations format* for details. Place them all somewhere, preferably in their *own repository*.
-1. Configure the tool by creating a `.migr8.yaml` in your project directory. Refer to the *Config* section for details.
+1. Choose your driver, and create your migrations. Refer to [Drivers](#drivers) for details. Place them all somewhere, preferably in their *own repository*.
+1. Configure the tool by creating a `.migr8.yaml` in your project directory. Refer to [Config](#configuration) for details.
 1. Create a file, e.g. `migrations.txt` somewhere in your repository, listing the migrations you want to have applied.
 1. Run `migr8 to migrations.txt` to apply the target state.
 
@@ -30,6 +38,36 @@ Here is where the target specification comes in handy: that is a simple text fil
 
 There is just one caveat: in order to know how to undo the migrations from the old branch, the migration definitions should not be checked into the VCS, else you cannot possibly know how to undo them after switching the branch. Simply put them into their own repository. In the future, we might implement some git integration to fetch downwards migrations from other branches.
 
+## Configuration
+
+Place a `.migr8.yaml` file in the root directory of your project. Fill it with these contents:
+
+```yaml
+database:
+  # this is the knex configuration, refer http://knexjs.org for reference
+  client: 'pg'
+  connection:
+    host: 'localhost'
+    user: 'foo'
+    password: 'bar'
+    database: 'baz'
+
+driver:
+  # how to execute migrations, see "Drivers" for details
+  type: 'sql'
+  # driver options go here
+
+storage:
+  # how to store current database state, see "Storage" for details
+  type: 'sql',
+  # storage options go here, for example:
+  tableName: '_migrations',
+
+migrations:
+  path: 'path/to/migrations/folder' # default: 'migrations'
+  pattern: '**.sql' # glob pattern inside migrations.path -> the matches are the migration IDs
+```
+
 ## Docs
 
 ### Strategies
@@ -41,7 +79,80 @@ There is just one caveat: in order to know how to undo the migrations from the o
 * **all**: migrate until you have applied all exisiting migrations
 * **reorder**: bring the migrations you have already applied into the correct order, but leave extraneous/missing migrations in peace
 
+### Drivers
 
-### Migrations format
+There are multiple formats in which you can specify your migrations. How a migration file is parsed depends on the driver you configured. Included are these drivers:
 
-There are multiple formats in which you can specify your migrations.
+#### `sql` driver
+
+This is the simplest driver, and it works with any database type you can think of: you specify your migration in pure SQL syntax. This is an example migration file:
+
+```sql
+This is some description, it is not executed as SQL but parsed as metadata.
+
+-- UP --
+
+CREATE TABLE person (
+  name VARCHAR(64)
+);
+
+-- DOWN --
+
+DROP TABLE person;
+```
+
+#### `js` driver
+
+You can also use the javascript interface for your migrations, exposed via the underlying knex instance. Here is the above example migration as javascript:
+
+```js
+module.exports.up = function (db, trx) {
+  return db.schema
+    .createTable('person', function (table) {
+      table.string('name', 32);
+    })
+    .transacting(trx);
+};
+
+module.exports.down = function (db, trx) {
+  return db.schema
+    .dropTable('person')
+    .transacting(trx);
+};
+
+// optional
+module.exports.meta = {
+  description: 'This is the description.',
+};
+```
+
+Please make sure to use the transaction that is passed as the second parameter, else you lose transaction support.
+
+You can also set the `driver.babel = true` configuration option, place a `.babelrc` in your repository and write ES6:
+
+```js
+export async function up(db, trx) {
+  await db.schema
+    .createTable('person', (table) => {
+      table.string('name', 32);
+    })
+    .transacting(trx);
+}
+
+export async function down(db, trx) {
+  await db.schema
+    .dropTable('person')
+    .transacting(trx);
+}
+
+// optional
+export const meta = {
+  description: 'This is the description.',
+};
+```
+
+### Storage
+
+When migr8 executes any migrations, it needs to remember the state of your database so it does not apply the same migrations twice, and is able to undo unwanted migrations later. This state is saved using a *storage module*, of which there is currently only one: the SQL storage. It stores the current database state inside your database, in a table named `_migrations` (which of course you can configure).
+
+In future, I might add support for file-based storage, or whatever you can think of.
