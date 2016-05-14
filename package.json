@@ -1,6 +1,6 @@
 {
   "name": "migr8",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A standalone tool for running migrations on relational databases.",
   "main": "lib/index.js",
   "repository": "https://github.com/opatut/migr8",

@@ -40,6 +40,12 @@ program
   .action(wrap(migrate.down));
 
 program
+  .command('down-up <migrations...>')
+  .description('migrate down, then up manually')
+  .action(wrap(migrate.downUp));
+
+
+program
   .command('list [type]')
   .description('list objects (migrations, strategies)')
   .action(wrap(list));

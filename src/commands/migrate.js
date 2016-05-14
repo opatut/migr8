@@ -123,4 +123,14 @@ export const target = async (targetFilePath, options) => {
   await runQueue(queue, storage, options);
 };
 
-export default {up, down, target};
+async function downUp(...args) {
+  await down(...args);
+  await up(...args);
+}
+
+export default {
+  up,
+  down,
+  target,
+  downUp,
+};
